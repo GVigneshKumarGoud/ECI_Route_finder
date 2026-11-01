@@ -1,0 +1,12 @@
+location_id,location_name,location_type
+L01,Main Gate,Entry Point
+L02,Admin Block,Administrative
+L03,Central Library,Academic
+L04,College Canteen,Food & Social
+L05,Sports Ground,Recreation
+L06,Hostel A,Residential
+L07,Hostel B,Residential
+L08,Science Lab,Academic
+L09,Auditorium,Event Venue
+L10,Parking Lot,Utility
+
