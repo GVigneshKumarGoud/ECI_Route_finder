@@ -1,12 +1,21 @@
 location_id,location_name,location_type
-L01,Main Gate,Entry Point
-L02,Admin Block,Administrative
-L03,Central Library,Academic
-L04,College Canteen,Food & Social
-L05,Sports Ground,Recreation
-L06,Hostel A,Residential
-L07,Hostel B,Residential
-L08,Science Lab,Academic
-L09,Auditorium,Event Venue
-L10,Parking Lot,Utility
-
+L01,NIMS Hospital,Hospital
+L02,Apollo Hospital Jubilee Hills,Hospital
+L03,Yashoda Hospital Secunderabad,Hospital
+L04,KIMS Hospital,Hospital
+L05,Care Hospital Banjara Hills,Hospital
+L06,Osmania General Hospital,Hospital
+L07,Gandhi Hospital,Hospital
+L08,Global Hospital Lakdi Ka Pool,Hospital
+L09,Rainbow Childrens Hospital,Hospital
+L10,Aware Global Hospital Dilsukhnagar,Hospital
+L11,Hitech City,IT Hub
+L12,Secunderabad Railway Station,Transport Hub
+L13,MGBS Bus Station,Transport Hub
+L14,Charminar,Landmark
+L15,LB Nagar,Area
+L16,Kukatpally,Area
+L17,Miyapur,Area
+L18,Uppal,Area
+L19,Banjara Hills,Area
+L20,Punjagutta,Area

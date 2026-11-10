@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ECI Route Finder — Emergency &amp; Critical Incident Route Finder</title>
+  <meta name="description" content="Emergency &amp; Critical Incident Route Finder — Powered by Dijkstra's Shortest Path Algorithm. Find optimal emergency routes across Hyderabad.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚨</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============ LOADING SCREEN ============ -->
+  <div class="loader" id="loader">
+    <div class="loader-content">
+      <div class="loader-spinner"></div>
+      <div class="loader-text">Initializing Emergency Systems<span class="dots">...</span></div>
+      <div class="loader-bar"><div class="loader-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- ============ NAVBAR ============ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#landing" class="nav-brand">🚨 ECI Route Finder</a>
+      <div class="nav-links" id="navLinks">
+        <a href="#landing" class="nav-link active">Home</a>
+        <a href="#dashboard" class="nav-link">Dashboard</a>
+        <a href="#finder" class="nav-link">Route Finder</a>
+        <a href="#analysis" class="nav-link">Analysis</a>
+        <a href="#algorithm" class="nav-link">Algorithm</a>
+        <a href="#about" class="nav-link">About</a>
+      </div>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ============ SECTION: LANDING / HERO ============ -->
+  <section id="landing" class="hero-section section">
+    <canvas id="heroCanvas"></canvas>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="pulse-dot"></span>
+        EMERGENCY NAVIGATION SYSTEM
+      </div>
+      <h1 class="hero-title">
+        Every Second <span class="highlight">Matters</span>.<br>
+        Every Route <span class="highlight">Counts</span>.
+      </h1>
+      <p class="hero-subtitle">Emergency &amp; Critical Incident Route Finder — Powered by Dijkstra's Shortest Path Algorithm</p>
+      <p class="hero-desc">An intelligent emergency navigation system that finds the optimal route between hospitals and incident locations across Hyderabad, comparing distance, travel time, and road conditions to recommend the best path.</p>
+      <div class="hero-buttons">
+        <a href="#finder" class="btn btn-primary btn-lg">
+          <span class="btn-icon">🚑</span> Find Emergency Route
+        </a>
+        <a href="#dashboard" class="btn btn-outline btn-lg">
+          <span class="btn-icon">📊</span> View Dashboard
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <div class="how-section">
+    <div class="container">
+      <div class="animate-on-scroll">
+        <h2 class="section-label">How It Works</h2>
+        <div class="how-grid">
+          <div class="how-card glass-card">
+            <div class="how-step">01</div>
+            <div class="how-icon">📍</div>
+            <h3>Select Locations</h3>
+            <p>Choose a hospital and emergency destination from 20 Hyderabad locations</p>
+          </div>
+          <div class="how-card glass-card">
+            <div class="how-step">02</div>
+            <div class="how-icon">⚙️</div>
+            <h3>Run Algorithm</h3>
+            <p>Dijkstra's algorithm calculates optimal paths using distance or travel time</p>
+          </div>
+          <div class="how-card glass-card">
+            <div class="how-step">03</div>
+            <div class="how-icon">✅</div>
+            <h3>Get Results</h3>
+            <p>View recommended route, compare alternatives, and see detailed analysis</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SECTION: DASHBOARD ============ -->
+  <section id="dashboard" class="section">
+    <div class="container">
+      <div class="animate-on-scroll">
+        <div class="section-header">
+          <h2 class="section-title">Emergency Control Dashboard</h2>
+        </div>
+
+        <div class="dashboard-stats">
+          <div class="stat-card glass-card accent-blue">
+            <div class="stat-icon">🏥</div>
+            <div class="stat-value"><span class="counter" data-target="20">0</span></div>
+            <div class="stat-label">Locations</div>
+          </div>
+          <div class="stat-card glass-card accent-green">
+            <div class="stat-icon">🛣️</div>
+            <div class="stat-value"><span class="counter" data-target="30">0</span></div>
+            <div class="stat-label">Roads</div>
+          </div>
+          <div class="stat-card glass-card accent-purple">
+            <div class="stat-icon">⚡</div>
+            <div class="stat-value"><span class="counter" data-target="2">0</span></div>
+            <div class="stat-label">Route Modes</div>
+          </div>
+          <div class="stat-card glass-card accent-orange">
+            <div class="stat-icon">📊</div>
+            <div class="stat-value"><span id="routesFoundCounter" class="counter" data-target="0">0</span></div>
+            <div class="stat-label">Routes Found</div>
+          </div>
+        </div>
+
+        <div class="quick-finder card glass-card">
+          <h3>⚡ Quick Route Search</h3>
+          <div class="quick-finder-grid">
+            <div class="form-group">
+              <label for="quickStart">📍 Starting Location</label>
+              <select id="quickStart" class="form-select">
+                <option value="">— Select Start —</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="quickEnd">🏁 Destination</label>
+              <select id="quickEnd" class="form-select">
+                <option value="">— Select End —</option>
+              </select>
+            </div>
+            <div class="form-group form-group-btn">
+              <button id="quickFindBtn" class="btn btn-primary full-width">⚡ Quick Find</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION: ROUTE FINDER ============ -->
+  <section id="finder" class="section">
+    <div class="container">
+      <div class="animate-on-scroll">
+        <div class="section-header">
+          <h2 class="section-title">🗺️ Emergency Route Finder</h2>
+          <p class="section-subtitle">Select your hospital and emergency destination. Let Dijkstra's algorithm calculate the optimal route.</p>
+        </div>
+
+        <div class="finder-grid">
+
+          <!-- LEFT COLUMN — Controls -->
+          <div class="finder-controls card glass-card">
+            <h3>Search Parameters</h3>
+
+            <div class="form-group">
+              <label for="startSel">📍 Starting Hospital</label>
+              <select id="startSel" class="form-select">
+                <option value="">— Select Start —</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="endSel">🏁 Emergency Destination</label>
+              <select id="endSel" class="form-select">
+                <option value="">— Select End —</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Search Mode</label>
+              <div class="mode-cards">
+                <div class="mode-card active" id="modeDistCard">
+                  <input type="radio" name="mode" value="distance" checked>
+                  <div class="mode-icon">📏</div>
+                  <div class="mode-info">
+                    <div class="mode-name">Shortest Distance</div>
+                    <div class="mode-hint">Minimizes total kilometres</div>
+                  </div>
+                </div>
+                <div class="mode-card" id="modeTimeCard">
+                  <input type="radio" name="mode" value="time">
+                  <div class="mode-icon">⏱️</div>
+                  <div class="mode-info">
+                    <div class="mode-name">Fastest Time</div>
+                    <div class="mode-hint">Minimizes travel minutes</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="finder-actions">
+              <button id="findBtn" class="btn btn-primary full-width">🔍 Find Best Route</button>
+              <button id="compareBtn" class="btn btn-secondary full-width">⚖️ Compare Both Routes</button>
+              <button id="resetBtn" class="btn btn-ghost full-width">↺ Reset</button>
+            </div>
+
+            <div class="finder-note">
+              <p>💡 Powered by Dijkstra's Algorithm — same O(V²) logic as the compiled C application.</p>
+            </div>
+          </div>
+
+          <!-- CENTER COLUMN — Map -->
+          <div class="finder-map card glass-card">
+            <div class="map-header">
+              <h3>Hyderabad Emergency Network</h3>
+              <div class="map-legend">
+                <span class="legend-item"><span class="legend-dot dot-start"></span> Start</span>
+                <span class="legend-item"><span class="legend-dot dot-end"></span> End</span>
+                <span class="legend-item"><span class="legend-dot dot-route"></span> Route</span>
+              </div>
+            </div>
+            <div class="map-container">
+              <svg id="campusMap" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                    <feMerge>
+                      <feMergeNode in="coloredBlur"/>
+                      <feMergeNode in="SourceGraphic"/>
+                    </feMerge>
+                  </filter>
+                  <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5"
+                    markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffcc00"/>
+                  </marker>
+                </defs>
+                <g id="edgesG"></g>
+                <g id="nodesG"></g>
+              </svg>
+            </div>
+            <p class="map-disclaimer">⚠️ Schematic network map — not geographic. Coordinates are for visualization only.</p>
+          </div>
+
+          <!-- RIGHT COLUMN — Results -->
+          <div class="finder-results card glass-card">
+            <h3>Route Results</h3>
+            <div id="resultsArea">
+              <div class="results-empty">
+                <div class="empty-icon">🗺️</div>
+                <p>Select start &amp; end locations, then click <strong>Find Best Route</strong> to see results.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Data Tables -->
+        <div class="data-section card glass-card">
+          <div class="tab-buttons">
+            <button class="tab-btn active" data-tab="locTab">📍 Locations (20)</button>
+            <button class="tab-btn" data-tab="roadTab">🛣️ Roads (30)</button>
+          </div>
+          <div class="tab-panel active" id="locTab">
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                  </tr>
+                </thead>
+                <tbody id="locTbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tab-panel" id="roadTab">
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Road ID</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Distance (km)</th>
+                    <th>Time (min)</th>
+                  </tr>
+                </thead>
+                <tbody id="roadTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION: ANALYSIS ============ -->
+  <section id="analysis" class="section">
+    <div class="container">
+      <div class="animate-on-scroll">
+        <div class="section-header">
+          <h2 class="section-title">📊 Route Analysis &amp; Comparison</h2>
+          <p class="section-subtitle">Compare distance and time routes side by side with detailed metrics</p>
+        </div>
+
+        <div id="analysisContent">
+          <div class="analysis-empty">
+            <div class="empty-icon">📊</div>
+            <p>Run a route comparison from the Route Finder to see detailed analysis here.</p>
+            <a href="#finder" class="btn btn-outline">Go to Route Finder</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION: ALGORITHM ============ -->
+  <section id="algorithm" class="section">
+    <div class="container">
+      <div class="animate-on-scroll">
+        <div class="section-header">
+          <h2 class="section-title">⚙️ Algorithm &amp; Data Structures</h2>
+          <p class="section-subtitle">The core computer science concepts behind ECI Route Finder</p>
+        </div>
+
+        <div class="algo-grid">
+
+          <!-- Card 1 — Graph Theory -->
+          <div class="algo-card glass-card">
+            <div class="algo-card-header">
+              <span class="algo-icon">🔵</span>
+              <h3>Graph Theory</h3>
+            </div>
+            <p>The city's road network is modelled as a weighted, undirected graph where intersections and landmarks are vertices and roads are edges. Each edge carries two weights — distance and travel time — enabling multi-criteria shortest-path searches.</p>
+            <pre><code>Vertices (V) = 20 Hyderabad locations
+Edges    (E) = 30 roads (bidirectional)
+Type         = Undirected, Weighted
+Weights      = distance_m, travel_time_min</code></pre>
+          </div>
+
+          <!-- Card 2 — Adjacency List -->
+          <div class="algo-card glass-card">
+            <div class="algo-card-header">
+              <span class="algo-icon">📋</span>
+              <h3>Adjacency List</h3>
+            </div>
+            <p>An adjacency list stores only existing edges, using O(V + E) memory instead of O(V²) required by an adjacency matrix. For sparse graphs like road networks this is far more efficient.</p>
+            <pre><code>typedef struct {
+    int to_index;
+    int distance_m;
+    int travel_time_min;
+} Neighbour;
+
+Neighbour adj[20][10];
+int neighbour_count[20];</code></pre>
+          </div>
+
+          <!-- Card 3 — Dijkstra's Algorithm -->
+          <div class="algo-card glass-card">
+            <div class="algo-card-header">
+              <span class="algo-icon">⚡</span>
+              <h3>Dijkstra's Algorithm</h3>
+            </div>
+            <p>A greedy shortest-path algorithm that progressively relaxes edges, always selecting the unvisited vertex with the smallest tentative distance. It guarantees the optimal path when all edge weights are non-negative.</p>
+            <ol class="algo-steps">
+              <li>Initialise dist[source] = 0, all others = ∞</li>
+              <li>Mark all vertices unvisited</li>
+              <li>Pick the unvisited vertex <em>u</em> with the smallest dist[u]</li>
+              <li>For each neighbour <em>v</em> of <em>u</em>, relax the edge: if dist[u] + weight(u,v) &lt; dist[v], update dist[v] and set parent[v] = u</li>
+              <li>Mark <em>u</em> visited; repeat from step 3 until destination is visited</li>
+            </ol>
+          </div>
+
+          <!-- Card 4 — Complexity Analysis -->
+          <div class="algo-card glass-card">
+            <div class="algo-card-header">
+              <span class="algo-icon">🧮</span>
+              <h3>Complexity Analysis</h3>
+            </div>
+            <p>Time complexity depends on the data structure used for selecting the minimum-distance vertex.</p>
+            <div class="table-wrapper">
+              <table class="data-table compact">
+                <thead>
+                  <tr><th>Implementation</th><th>Time Complexity</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Simple array (this project)</td><td>O(V²)</td></tr>
+                  <tr><td>Min Heap / Priority Queue</td><td>O((V+E) log V)</td></tr>
+                  <tr><td>Nodes (V)</td><td>20</td></tr>
+                  <tr><td>Edges (E)</td><td>30</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Card 5 — C Implementation -->
+          <div class="algo-card glass-card">
+            <div class="algo-card-header">
+              <span class="algo-icon">💻</span>
+              <h3>C Implementation</h3>
+            </div>
+            <p>The core algorithm is implemented in pure C with no external libraries. The <code>dijkstra()</code> function accepts the graph, source, destination, and a mode flag to switch between distance and time optimisation.</p>
+            <pre><code>void dijkstra(
+    int adj[][MAX_NEIGHBOURS],
+    int neighbour_count[],
+    int num_locations,
+    int source,
+    int destination,
+    int mode   // 0 = distance, 1 = time
+);</code></pre>
+          </div>
+
+          <!-- Card 6 — Two Route Modes -->
+          <div class="algo-card glass-card">
+            <div class="algo-card-header">
+              <span class="algo-icon">🔄</span>
+              <h3>Two Route Modes</h3>
+            </div>
+            <p>The algorithm supports two optimisation criteria. The mode flag selects which edge weight to use during relaxation.</p>
+            <div class="table-wrapper">
+              <table class="data-table compact">
+                <thead>
+                  <tr><th>Mode</th><th>Edge Weight Used</th><th>Optimises For</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Distance</td><td><code>distance_m</code></td><td>Shortest total km</td></tr>
+                  <tr><td>Time</td><td><code>travel_time_min</code></td><td>Fastest total minutes</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="algo-note">The <code>parent[]</code> array reconstructs the full path from destination back to source after the algorithm completes.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION: ABOUT ============ -->
+  <section id="about" class="section">
+    <div class="container">
+      <div class="animate-on-scroll">
+        <div class="section-header">
+          <h2 class="section-title">📄 About This Project</h2>
+        </div>
+
+        <div class="about-grid">
+
+          <!-- Card 1 — Project Details -->
+          <div class="about-card glass-card">
+            <h3>📌 Project Details</h3>
+            <ul class="detail-list">
+              <li><span class="detail-key">Full Name</span><span class="detail-val">Emergency &amp; Critical Incident Route Finder</span></li>
+              <li><span class="detail-key">Short Name</span><span class="detail-val">ECI Route Finder</span></li>
+              <li><span class="detail-key">Subject</span><span class="detail-val">ADS + DBMS</span></li>
+              <li><span class="detail-key">Algorithm</span><span class="detail-val">Dijkstra's Shortest Path</span></li>
+              <li><span class="detail-key">Language</span><span class="detail-val">C</span></li>
+              <li><span class="detail-key">Tagline</span><span class="detail-val">"Every Second Matters. Every Route Counts."</span></li>
+            </ul>
+          </div>
+
+          <!-- Card 2 — Problem Statement -->
+          <div class="about-card glass-card">
+            <h3>🎯 Problem Statement</h3>
+            <p>During emergencies in a large city like Hyderabad, every second counts. Ambulances and first responders need to reach incident sites via the fastest possible route — but choosing the optimal path across dozens of roads and intersections is non-trivial.</p>
+            <p>ECI Route Finder solves this by modelling Hyderabad's road network as a weighted graph and applying Dijkstra's algorithm to find the shortest (distance) or fastest (time) route between any two of the 20 mapped locations.</p>
+          </div>
+
+          <!-- Card 3 — Technology Stack -->
+          <div class="about-card glass-card">
+            <h3>🛠️ Technology Stack</h3>
+            <div class="tech-pills">
+              <span class="pill">C Language</span>
+              <span class="pill">Dijkstra's Algorithm</span>
+              <span class="pill">Adjacency List</span>
+              <span class="pill">HTML5</span>
+              <span class="pill">CSS3</span>
+              <span class="pill">JavaScript</span>
+              <span class="pill">MySQL</span>
+              <span class="pill">GCC / MSYS2</span>
+              <span class="pill">Git</span>
+            </div>
+          </div>
+
+          <!-- Card 4 — Data Structures Used -->
+          <div class="about-card glass-card">
+            <h3>🧱 Data Structures Used</h3>
+            <ul class="ds-list">
+              <li><span class="ds-check">✅</span> Graph (Weighted, Undirected)</li>
+              <li><span class="ds-check">✅</span> Adjacency List</li>
+              <li><span class="ds-check">✅</span> Arrays (dist[], visited[], parent[])</li>
+              <li><span class="ds-check">✅</span> Struct (Neighbour, Location)</li>
+              <li><span class="ds-plan">⬜</span> Min Heap / Priority Queue (planned)</li>
+            </ul>
+          </div>
+
+          <!-- Card 5 — Project Structure -->
+          <div class="about-card glass-card">
+            <h3>📁 Project Structure</h3>
+            <pre><code>ECI_Route_Finder/
+├── ads_c/
+│   ├── include/
+│   │   └── route_finder.h
+│   └── src/
+│       ├── graph.c
+│       └── dijkstra.c
+├── data/
+│   ├── locations.csv   ← 20 Hyderabad locations
+│   └── routes.csv      ← 30 bidirectional roads
+├── web/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+└── dbms_mysql/</code></pre>
+          </div>
+
+          <!-- Card 6 — How to Compile -->
+          <div class="about-card glass-card">
+            <h3>🚀 How to Compile</h3>
+            <p>Build and run the C application with GCC:</p>
+            <pre><code>cd "ECI_Route_Finder"
+
+gcc ads_c/src/graph.c ads_c/src/dijkstra.c \
+    -o eci_route_finder.exe
+
+./eci_route_finder.exe</code></pre>
+            <p>Then open <code>web/index.html</code> in a browser for the interactive dashboard.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>🚨 ECI Route Finder</h3>
+          <p>Every Second Matters. Every Route Counts.</p>
+        </div>
+        <div class="footer-links">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="#landing">Home</a></li>
+            <li><a href="#dashboard">Dashboard</a></li>
+            <li><a href="#finder">Route Finder</a></li>
+            <li><a href="#analysis">Analysis</a></li>
+            <li><a href="#algorithm">Algorithm</a></li>
+            <li><a href="#about">About</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>ADS &amp; DBMS College Project · Dijkstra's Algorithm · Graph Theory</p>
+        <p class="footer-note">Built with C, HTML, CSS &amp; JavaScript</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

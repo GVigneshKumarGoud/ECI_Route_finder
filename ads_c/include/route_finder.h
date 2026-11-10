@@ -32,14 +32,18 @@
    update later — change the number in one place only.
    ============================================================ */
 
-/* Maximum number of locations (nodes) in the campus map */
-#define MAX_LOCATIONS 10
+/* Maximum number of locations (nodes) in the road network */
+#define MAX_LOCATIONS 20
 
-/* Maximum number of roads (edges) in the campus map */
-#define MAX_ROADS 17
+/* Maximum number of roads (edges) in the road network */
+#define MAX_ROADS 30
 
 /* Maximum number of characters allowed in a text field */
 #define MAX_NAME_LEN 50
+
+/* Maximum number of direct neighbours any one location can have.
+   In our campus map no location connects to more than 10 others. */
+#define MAX_NEIGHBOURS 10
 
 /* ============================================================
    STRUCTURE: Location
@@ -71,6 +75,24 @@ typedef struct {
 } Road;
 
 /* ============================================================
+   STRUCTURE: Neighbour
+   Represents one direct connection seen from a location's
+   point of view inside the adjacency list.
+
+   Example: from L01, one neighbour entry would be:
+     to_index       = 1      (meaning L02, index 1)
+     distance_m     = 200    (road is 200 metres long)
+     travel_time_min= 3      (takes 3 minutes to travel)
+   ============================================================ */
+typedef struct {
+
+    int to_index;           /* Index (0–9) of the neighbouring location */
+    int distance_m;         /* Cost by distance  (metres)               */
+    int travel_time_min;    /* Cost by time      (minutes)              */
+
+} Neighbour;
+
+/* ============================================================
    STRUCTURE: Graph
    The complete campus road network.
    It holds an array of all locations and all roads together.
@@ -84,10 +106,22 @@ typedef struct {
     Road     roads[MAX_ROADS];         /* All roads between locations    */
     int      road_count;               /* How many roads are loaded      */
 
+    /* ── Adjacency List ────────────────────────────────────────────
+       adj[i] holds all direct neighbours of location at index i.
+       neighbour_count[i] says how many neighbours location i has.
+
+       Example after building:
+         adj[0][0] → { to_index=1, distance_m=200, travel_time_min=3 }
+         adj[0][1] → { to_index=9, distance_m=150, travel_time_min=2 }
+         neighbour_count[0] = 3   (L01 connects to 3 locations)
+       ────────────────────────────────────────────────────────────── */
+    Neighbour adj[MAX_LOCATIONS][MAX_NEIGHBOURS]; /* Adjacency list     */
+    int       neighbour_count[MAX_LOCATIONS];     /* Neighbours per loc */
+
 } Graph;
 
 /* ── End of Include Guard ───────────────────────────────────
    Matches the #ifndef at the top. Everything between
    #ifndef and #endif is protected from double-inclusion.  */
-#endif /* ROUTE_FINDER_H */
+  #endif /* ROUTE_FINDER_H */
 
